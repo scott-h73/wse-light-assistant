@@ -7,7 +7,25 @@
     body {
       font-family: sans-serif;
       padding: 20px;
+      margin: 0;
+      position: relative;
     }
+
+    #logo-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #logo {
+      height: 60px;
+      width: auto;
+    }
+
+    h1 {
+      margin-top: 100px; /* pushes title down below logo */
+    }
+
     input, button, textarea {
       padding: 10px;
       margin-top: 10px;
@@ -15,31 +33,25 @@
       max-width: 500px;
       font-size: 16px;
     }
-  #response {
-  font-family: sans-serif;
-  white-space: pre-wrap;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 5px;
-}
-    #logo-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
 
-#logo {
-  height: 50px;
-  width: auto;
-}
+    #response {
+      font-family: sans-serif;
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Logo in top-right corner -->
   <div id="logo-container">
-  <img src="logo.png" alt="Company Logo" id="logo" />
-</div>
+    <img src="logo.png" alt="Company Logo" id="logo" />
+  </div>
+
   <h1>WSE Light Assistant</h1>
   <p>Ask a technical question:</p>
   <input type="text" id="userInput" placeholder="Enter your question here" />
@@ -66,16 +78,16 @@
         });
 
         const result = await response.json();
-       let answer = result.answer || result.output || JSON.stringify(result);
-try {
-  // Try to parse if it's accidentally still wrapped in a JSON string
-  const parsed = JSON.parse(answer);
-  answer = parsed.output || parsed.answer || answer;
-} catch (e) {
-  // Not JSON, just use the raw string
-}
+        let answer = result.answer || result.output || JSON.stringify(result);
 
-responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\\"/g, '"');
+        try {
+          const parsed = JSON.parse(answer);
+          answer = parsed.output || parsed.answer || answer;
+        } catch (e) {
+          // leave answer as is
+        }
+
+        responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\\"/g, '"');
       } catch (error) {
         responseDiv.innerText = "Error: " + error.message;
       }
@@ -84,3 +96,4 @@ responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\\"/g, '"');
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>
 </html>
+
