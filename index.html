@@ -15,12 +15,15 @@
       max-width: 500px;
       font-size: 16px;
     }
-    #response {
-      margin-top: 20px;
-      white-space: pre-wrap;
-      background: #f5f5f5;
-      padding: 10px;
-    }
+  #response {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+}
   </style>
 </head>
 <body>
@@ -50,7 +53,16 @@
         });
 
         const result = await response.json();
-       responseDiv.innerHTML = marked.parse(result.output || JSON.stringify(result, null, 2));
+       let answer = result.answer || result.output || JSON.stringify(result);
+try {
+  // Try to parse if it's accidentally still wrapped in a JSON string
+  const parsed = JSON.parse(answer);
+  answer = parsed.output || parsed.answer || answer;
+} catch (e) {
+  // Not JSON, just use the raw string
+}
+
+responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\\"/g, '"');
       } catch (error) {
         responseDiv.innerText = "Error: " + error.message;
       }
