@@ -112,11 +112,13 @@
       responseDiv.innerText = "Loading...";
 
       try {
+        const credentials = btoa("wseuser:uniwave200");
+
         const response = await fetch("https://scottuniwave200wse.app.n8n.cloud/webhook/47abca39-190d-48ff-b4a2-3e7989221286/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer mySecret2025" // secure token
+            "Authorization": "Basic " + credentials
           },
           body: JSON.stringify({
             chatInput: userInput
