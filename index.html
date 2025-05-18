@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WSE Light Assistant</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -15,10 +15,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      padding: 30px 20px 60px; /* extra bottom padding for mobile comfort */
+      box-sizing: border-box;
     }
 
     #logo {
@@ -31,7 +31,8 @@
     }
 
     #avatar {
-      width: 300px;
+      width: 200px;
+      max-width: 80vw;
       height: auto;
       margin-bottom: 30px;
     }
@@ -39,12 +40,14 @@
     h1 {
       font-weight: 500;
       margin-bottom: 10px;
+      font-size: 1.8rem;
     }
 
     p {
       font-weight: 300;
       max-width: 400px;
       margin-bottom: 40px;
+      font-size: 1rem;
     }
 
     .button {
@@ -58,20 +61,90 @@
       cursor: pointer;
       transition: background 0.3s ease;
       text-decoration: none;
+      margin-bottom: 20px;
     }
 
     .button:hover {
       background-color: #00a18d;
+    }
+
+    #pin-container {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      width: 200px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #main-content {
+      display: none;
+      max-width: 90vw;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      p {
+        font-size: 0.95rem;
+      }
+
+      .button {
+        font-size: 16px;
+        padding: 12px 24px;
+      }
+
+      #avatar {
+        width: 160px;
+      }
     }
   </style>
 </head>
 <body>
 
   <img id="logo" src="logo-white.png" alt="Company Logo" />
-  <img id="avatar" src="avatar.png" alt="Assistant Avatar" />
-  <h1>Welcome to WSE Light Assistant</h1>
-  <p>Your technical knowledge guide for wave energy systems and beyond.</p>
-  <a href="technical.html" class="button">Get Started</a>
+
+  <div id="pin-container">
+    <h2>Enter Access PIN</h2>
+    <input type="password" id="pinInput" placeholder="Enter PIN" />
+    <br />
+    <button onclick="checkPIN()">Submit</button>
+    <p id="pinMessage"></p>
+  </div>
+
+  <div id="main-content">
+    <img id="avatar" src="avatar.png" alt="Assistant Avatar" />
+    <h1>Welcome to WSE Light Assistant</h1>
+    <p>Your technical knowledge guide for wave energy systems and beyond.</p>
+    <a href="technical.html" class="button">Get Started</a>
+  </div>
+
+  <script>
+    const correctPIN = "2025"; // Change this as needed
+
+    function checkPIN() {
+      const userPIN = document.getElementById("pinInput").value;
+      const pinMessage = document.getElementById("pinMessage");
+
+      if (userPIN === correctPIN) {
+        document.getElementById("pin-container").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      } else {
+        pinMessage.textContent = "Incorrect PIN. Please try again.";
+      }
+    }
+  </script>
 
 </body>
 </html>
