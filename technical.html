@@ -1,63 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WSE Light Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WSE Light Assistant – Technical Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
       margin: 0;
-      position: relative;
-    }
-
-    #logo-container {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
 
     #logo {
-      height: 120px;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      height: 50px;
       width: auto;
+      filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
     }
 
     h1 {
-      margin-top: 100px; /* pushes title down below logo */
+      font-size: 28px;
+      font-weight: 500;
+      margin-top: 100px;
+      text-align: center;
     }
 
-    input, button, textarea {
-      padding: 10px;
-      margin-top: 10px;
+    p {
+      font-weight: 300;
+      text-align: center;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+
+    #chat-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    input, button {
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 16px;
+      margin-top: 10px;
       font-size: 16px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    input {
+      background: #ffffff;
+      color: #000;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #00BFA6;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00a18d;
     }
 
     #response {
-      font-family: sans-serif;
-      white-space: pre-wrap;
       background: #f9f9f9;
-      border: 1px solid #ccc;
+      color: #000;
       padding: 15px;
       margin-top: 20px;
-      border-radius: 5px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 15px;
+      min-height: 80px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Logo in top-right corner -->
-  <div id="logo-container">
-    <img src="logo.png" alt="Company Logo" id="logo" />
+  <img id="logo" src="logo-white.png" alt="Company Logo" />
+  <h1>Technical Assistant</h1>
+  <p>Ask a technical question below and receive an instant response powered by WSE Light Assistant.</p>
+
+  <div id="chat-container">
+    <input type="text" id="userInput" placeholder="Enter your technical question..." />
+    <button onclick="submitQuestion()">Submit</button>
+    <div id="response"></div>
   </div>
-
-  <h1>WSE Light Assistant</h1>
-  <p>Ask a technical question:</p>
-  <input type="text" id="userInput" placeholder="Enter your question here" />
-  <button onclick="submitQuestion()">Submit</button>
-
-  <div id="response"></div>
 
   <script>
     async function submitQuestion() {
@@ -87,13 +132,12 @@
           // leave answer as is
         }
 
-        responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\\"/g, '"');
+        responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\"/g, '"');
       } catch (error) {
         responseDiv.innerText = "Error: " + error.message;
       }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 </body>
 </html>
-
