@@ -42,45 +42,68 @@
       width: 100%;
       max-width: 600px;
       background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
+      padding: 20px;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       margin-top: 20px;
     }
     input, button {
       font-family: 'Poppins', sans-serif;
-      padding: 12px 16px;
-      margin-top: 10px;
       font-size: 16px;
-      width: 100%;
-      border-radius: 8px;
       border: none;
       box-sizing: border-box;
     }
     input {
       background: #ffffff;
       color: #000;
-      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      flex: 1;
     }
     button {
       background-color: #00BFA6;
       color: white;
-      font-weight: 500;
+      padding: 12px;
+      border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s ease;
+      margin-left: 10px;
     }
     button:hover {
       background-color: #00a18d;
     }
-    #response {
+    #chat-container {
+      max-height: 500px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .message {
       background: #f9f9f9;
       color: #000;
-      padding: 15px;
-      margin-top: 20px;
+      padding: 12px;
+      margin-top: 10px;
       border-radius: 8px;
       white-space: pre-wrap;
-      font-size: 15px;
-      min-height: 80px;
+    }
+    .user-message {
+      background: #00BFA6;
+      color: #fff;
+      align-self: flex-end;
+    }
+    #chat-input {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    #pinInput {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #000;
+    }
+    .send-icon {
+      font-size: 20px;
     }
   </style>
 </head>
@@ -99,14 +122,18 @@
   </div>
 
   <!-- Chat Section (hidden by default) -->
-  <div id="chat-section" style="display: none;">
-    <input type="text" id="userInput" placeholder="Enter your technical question..." />
-    <button onclick="submitQuestion()">Submit</button>
-    <div id="response"></div>
+  <div id="chat-section" style="display: none; flex-direction: column;">
+    <div id="chat-container"></div>
+    <div id="chat-input">
+      <input type="text" id="userInput" placeholder="Type your question..." />
+      <button onclick="submitQuestion()">
+        &#9658; <!-- Play/Send icon -->
+      </button>
+    </div>
   </div>
 
   <script>
-    const correctPIN = "2025"; // Change this to your preferred PIN
+    const correctPIN = "2025"; // Change as needed
 
     function checkPIN() {
       const userPIN = document.getElementById("pinInput").value;
@@ -114,21 +141,32 @@
 
       if (userPIN === correctPIN) {
         document.getElementById("pin-section").style.display = "none";
-        document.getElementById("chat-section").style.display = "block";
+        document.getElementById("chat-section").style.display = "flex";
       } else {
         pinMessage.textContent = "Incorrect PIN. Please try again.";
       }
     }
 
-    async function submitQuestion() {
-      const userInput = document.getElementById("userInput").value;
-      const responseDiv = document.getElementById("response");
+    function addMessage(content, sender) {
+      const chatContainer = document.getElementById("chat-container");
+      const div = document.createElement("div");
+      div.className = "message";
+      if (sender === "user") div.classList.add("user-message");
+      div.textContent = content;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-      responseDiv.innerText = "Loading...";
+    async function submitQuestion() {
+      const userInput = document.getElementById("userInput");
+      const question = userInput.value.trim();
+      if (!question) return;
+
+      addMessage(question, "user");
+      userInput.value = "";
 
       try {
-        // Replace 'username:password' with your actual Basic Auth credentials
-        const credentials = btoa("waveswell:UniWave200");
+        const credentials = btoa("waveswell:UniWave200"); // Replace with real credentials
         const response = await fetch("https://scottuniwave200wse.app.n8n.cloud/webhook/41d16f40-2ece-44a5-802d-1322714c4e62/chat", {
           method: "POST",
           headers: {
@@ -136,23 +174,23 @@
             "Authorization": "Basic " + credentials
           },
           body: JSON.stringify({
-            chatInput: userInput
+            chatInput: question
           })
         });
 
-        const result = await response.json();
-        let answer = result.answer || result.output || JSON.stringify(result);
+        const text = await response.text();
+        let answer;
 
         try {
-          const parsed = JSON.parse(answer);
-          answer = parsed.output || parsed.answer || answer;
+          const result = JSON.parse(text);
+          answer = result.answer || result.output || JSON.stringify(result);
         } catch (e) {
-          // leave as is
+          answer = text;
         }
 
-        responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+        addMessage(answer, "assistant");
       } catch (error) {
-        responseDiv.innerText = "Error: " + error.message;
+        addMessage("Error: " + error.message, "assistant");
       }
     }
   </script>
