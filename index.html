@@ -14,13 +14,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      padding: 40px 20px;
       min-height: 100vh;
-      text-align: center;
-      padding: 30px 20px 60px; /* extra bottom padding for mobile comfort */
       box-sizing: border-box;
     }
-
     #logo {
       position: absolute;
       top: 20px;
@@ -29,119 +26,132 @@
       width: auto;
       filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
     }
-
-    #avatar {
-      width: 200px;
-      max-width: 80vw;
-      height: auto;
-      margin-bottom: 30px;
-    }
-
     h1 {
+      font-size: 28px;
       font-weight: 500;
-      margin-bottom: 10px;
-      font-size: 1.8rem;
+      margin-top: 100px;
+      text-align: center;
     }
-
     p {
       font-weight: 300;
-      max-width: 400px;
-      margin-bottom: 40px;
-      font-size: 1rem;
+      text-align: center;
+      max-width: 600px;
+      margin-bottom: 30px;
     }
-
-    .button {
+    #pin-section, #chat-section {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      margin-top: 20px;
+    }
+    input, button {
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      box-sizing: border-box;
+    }
+    input {
+      background: #ffffff;
+      color: #000;
+      margin-bottom: 10px;
+    }
+    button {
       background-color: #00BFA6;
       color: white;
-      border: none;
-      padding: 14px 32px;
-      border-radius: 30px;
-      font-size: 18px;
       font-weight: 500;
       cursor: pointer;
       transition: background 0.3s ease;
-      text-decoration: none;
-      margin-bottom: 20px;
     }
-
-    .button:hover {
+    button:hover {
       background-color: #00a18d;
     }
-
-    #pin-container {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    input[type="password"] {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      width: 200px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    #main-content {
-      display: none;
-      max-width: 90vw;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      p {
-        font-size: 0.95rem;
-      }
-
-      .button {
-        font-size: 16px;
-        padding: 12px 24px;
-      }
-
-      #avatar {
-        width: 160px;
-      }
+    #response {
+      background: #f9f9f9;
+      color: #000;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 15px;
+      min-height: 80px;
     }
   </style>
 </head>
 <body>
 
   <img id="logo" src="logo-white.png" alt="Company Logo" />
+  <h1>WSE Light Assistant</h1>
+  <p>Your technical knowledge guide for wave energy systems and beyond.</p>
 
-  <div id="pin-container">
+  <!-- PIN Section -->
+  <div id="pin-section">
     <h2>Enter Access PIN</h2>
     <input type="password" id="pinInput" placeholder="Enter PIN" />
-    <br />
     <button onclick="checkPIN()">Submit</button>
     <p id="pinMessage"></p>
   </div>
 
-  <div id="main-content">
-    <img id="avatar" src="avatar.png" alt="Assistant Avatar" />
-    <h1>Welcome to WSE Light Assistant</h1>
-    <p>Your technical knowledge guide for wave energy systems and beyond.</p>
-    <a href="technical.html" class="button">Get Started</a>
+  <!-- Chat Section (hidden by default) -->
+  <div id="chat-section" style="display: none;">
+    <input type="text" id="userInput" placeholder="Enter your technical question..." />
+    <button onclick="submitQuestion()">Submit</button>
+    <div id="response"></div>
   </div>
 
   <script>
-    const correctPIN = "2025"; // Change this as needed
+    const correctPIN = "2025"; // Change as needed
 
     function checkPIN() {
       const userPIN = document.getElementById("pinInput").value;
       const pinMessage = document.getElementById("pinMessage");
 
       if (userPIN === correctPIN) {
-        document.getElementById("pin-container").style.display = "none";
-        document.getElementById("main-content").style.display = "block";
+        document.getElementById("pin-section").style.display = "none";
+        document.getElementById("chat-section").style.display = "block";
       } else {
         pinMessage.textContent = "Incorrect PIN. Please try again.";
+      }
+    }
+
+    async function submitQuestion() {
+      const userInput = document.getElementById("userInput").value;
+      const responseDiv = document.getElementById("response");
+
+      responseDiv.innerText = "Loading...";
+
+      try {
+        // Send the request to the n8n endpoint without exposing Basic Auth in the JS
+        const response = await fetch("https://scottuniwave200wse.app.n8n.cloud/webhook/41d16f40-2ece-44a5-802d-1322714c4e62/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chatInput: userInput
+          }),
+          credentials: "include" // optional, only if your n8n endpoint supports cookies
+        });
+
+        const result = await response.json();
+        let answer = result.answer || result.output || JSON.stringify(result);
+
+        try {
+          const parsed = JSON.parse(answer);
+          answer = parsed.output || parsed.answer || answer;
+        } catch (e) {
+          // leave answer as is
+        }
+
+        responseDiv.innerText = answer.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+      } catch (error) {
+        responseDiv.innerText = "Error: " + error.message;
       }
     }
   </script>
